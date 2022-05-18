@@ -1,0 +1,40 @@
+<style>
+    div.feed {
+        white-space:no-wrap;
+        overflow:hidden;
+    }
+    div.feed > div.feed-text {
+        white-space:nowrap;
+        display:inline;
+        width:auto;
+        font-family: 'Courier New', Courier, monospace;
+    }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<div class='feed'>
+    <div class='feed-text'>
+    </div>
+</div>
+<script>
+ $(document).ready(function() {
+    var x = $.getJSON("https://data.messari.io/api/v2/assets?fields=id,slug,symbol,metrics/market_data/price_usd", function(result){
+      $.each(result.data, function(i, field){
+        $("div.feed-text").append(field.symbol + ": $" +  Math.round(field.metrics.market_data.price_usd * 100) / 100 + " | ");
+      });
+    });
+    var feed = $('div.feed');
+    console.log(feed);
+    feed.each(function() {
+        var f = $(this),indent = f.width();
+        f.feed = function() {
+            indent--;
+            f.css('text-indent',indent);
+            if (indent < -1 * f.children('div.feed-text').width()) {
+                indent = f.width();
+            }
+        };
+        f.data('interval',setInterval(f.feed,1000/60));
+    });
+});
+</script>
+
